@@ -10,6 +10,8 @@ Taken: User chooses Rock, collective data states that...
 + 46% they choose Scissor
 -> Decide to choose Scissor to beat Paper in prior.
 
+Accessible via: https://lelekhoa1812.github.io/Rock-Paper-Scissor-AI-Game/RPS.html
+
 Acknowledgement: Design concept retrieved and inspired from https://youra199.github.io/Rock-paper-scissors/
 
 ## Design still have to be improved and progressing
