@@ -1,9 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rock Paper Scissors AI Game</title>
 <style>
     @import url('https://fonts.googleapis.com/css?family=Acme&display=swap');
 
@@ -173,9 +167,9 @@ input[id^="paper"]:checked ~ div #computer-hand .finger-4 {
     display: none; /* Hide the refresh button by default */
     text-align: center;
     margin-top: 20px; /* Add margin to create space between button and message */
-  }
+}
 
-  #refreshbtn button {
+#refreshbtn button {
     background-color: rgb(197, 162, 96);
     color: white;
     padding: 15px 30px;
@@ -184,11 +178,11 @@ input[id^="paper"]:checked ~ div #computer-hand .finger-4 {
     border: none;
     cursor: pointer;
     transition: background-color 0.3s ease;
-  }
+}
 
-  #refreshbtn button:hover {
+#refreshbtn button:hover {
     background-color: rgb(124, 85, 10); 
-  }
+}
 
 #message {
   text-align: center;
@@ -239,7 +233,7 @@ label:active::before {
 
 
 label {
-  animation: changeOrder 0.3s infinite;
+  animation: changeOrder 0.45s infinite linear;
   background: #f5f5f5;
   border: 1px solid #ccc;
   box-sizing: border-box;
@@ -263,10 +257,8 @@ label:nth-of-type(1) { animation-delay: -0.00s; }
 label:nth-of-type(2) { animation-delay: -0.15s; }
 label:nth-of-type(3) { animation-delay: -0.30s; }
 </style>
-</head>
 
 <form>
-
     <input type="radio" id="rock-rock" name="rock-paper-scissors">
     <input type="radio" id="rock-paper" name="rock-paper-scissors">
     <input type="radio" id="rock-scissors" name="rock-paper-scissors">
@@ -323,26 +315,46 @@ label:nth-of-type(3) { animation-delay: -0.30s; }
   
     <div id="message">
       <h2></h2>
+      <div id="results">
+        <p>Rock Prob: <span id="rock-prob">0</span></p>
+        <p>Paper Prob: <span id="paper-prob">0</span></p>
+        <p>Scissors Prob: <span id="scissors-prob">0</span></p>
+        <p>All: <span id="all">0</span></p>
+      </div>
     </div>
 
     <div id="refreshbtn">
-      <button type="button">Refresh Round</button>
+      <button type="reset">Refresh Round</button>
     </div>
   
   </form>
   <script>
+    let all = 0;
+    let rockCount = 0;
+    let paperCount = 0;
+    let scissorsCount = 0;
+
     // JavaScript to toggle active class on label click
     const labels = document.querySelectorAll('label');
     labels.forEach(label => {
       label.addEventListener('click', () => {
+        all++; // 'all' variable add 1 by each click
         label.classList.toggle('active');
+          labels.forEach(label => {
+          label.style.display = 'none'; // Hide all label boxes after choice
+        });
         document.getElementById('refreshbtn').style.display = 'block'; // Display the refresh button when any box is clicked
+        const choice = label.getAttribute('for').split('-')[1];
+        incrementCount(choice);
       });
     });
   
     // JavaScript to hide the refresh button when it's clicked
     const refreshButton = document.querySelector('#refreshbtn button');
     refreshButton.addEventListener('click', () => {
+      labels.forEach(label => {
+        label.style.display = 'block'; // Display all label boxes after refresh
+      });
       document.getElementById('refreshbtn').style.display = 'none'; // Hide the refresh button after refresh
       document.querySelector('form').reset(); // Reset form so it picks a new random choice
     });
@@ -350,6 +362,53 @@ label:nth-of-type(3) { animation-delay: -0.30s; }
     // JavaScript to randomly select a choice for the website
     const choices = ['rock', 'paper', 'scissors'];
     const randomChoice = choices[Math.floor(Math.random() * choices.length)];
-    document.getElementById(`computer-${randomChoice}`).checked = true;
+    if (all === 0) {
+      document.getElementById(`computer-${randomChoice}`).checked = true;
+    }
+    else if (all > 0)
+    {
+      if (rockCount === paperCount && paperCount === scissorsCount)     // Equality
+      {
+        document.getElementById(`computer-${randomChoice}`).checked = true;
+      }
+      else if (rockCount > paperCount && rockCount > scissorsCount)     // Rock most
+      {
+        document.getElementById('computer-paper').checked = true;
+      }
+      else if (paperCount > rockCount && paperCount > scissorsCount)    // Paper most
+      {
+        document.getElementById('computer-scissor').checked = true;
+      }
+      else if (scissorsCount > rockCount && scissorsCount > paperCount) // Scissors most
+      {
+        document.getElementById('computer-rock').checked = true;
+      }
+      else // When two options met equality that is greater than one other
+      {
+        document.getElementById(`computer-${randomChoice}`).checked = true;
+      }
+    }
   
+    // Function to calculate probability
+    function incrementCount(choice) {
+      document.getElementById('all').textContent = all; // Update the "all" count
+
+      if (choice ===  'rock') {
+        rockCount++;
+      }
+      else if (choice ===  'paper') {
+        paperCount++;
+      }
+      else if (choice ===  'scissors') {
+        scissorsCount++;
+      }
+      const rockProb = (rockCount / all).toFixed(2); 
+      const paperProb = (paperCount / all).toFixed(2); 
+      const scissorsProb = (scissorsCount / all).toFixed(2); 
+
+      document.getElementById('rock-prob').textContent = rockProb; // Update the rock prob
+      document.getElementById('paper-prob').textContent = paperProb; // Update the paper prob
+      document.getElementById('scissors-prob').textContent = scissorsProb; // Update the scissors prob
+
+    }
   </script>
