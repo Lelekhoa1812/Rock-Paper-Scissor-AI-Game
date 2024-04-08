@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Rock Paper Scissors AI Game</title>
+  <link rel="website icon" type="png" href="lb.png" >
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Acme&display=swap');
+
+    @keyframes changeOrder {
+      from { z-index: 9;}
+      to { z-index: 1; }
+    }
+
+    @keyframes handShake {
+      0%,100% { transform: rotate(10deg); }
+      50% { transform: rotate(-10deg); }
+    }
+
+    @keyframes handShake2 {
+      0%,100% { transform: rotateY(180deg) rotate(10deg); }
+      50% { transform: rotateY(180deg) rotate(-10deg); }
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      line-height: 1;
+      font-family: Acme, Arial, sans-serif;
+    }
+
+    form {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #hands {
+      text-align: center;
+    }
+
+    input:checked ~ div .hand {
+      animation: none !important;
+    }
+
+    .hand {
+      margin: 20px;
+      width: 200px;
+      height: 200px;
+      position: relative;
+      transform: rotate(10deg);
+      display: inline-block;
+      animation: handShake 2s infinite;
+    }
+
+    .hand > div {
+      position: absolute;
+      box-sizing: border-box;
+      border: 2px solid black;
+      background: rgb(238, 192, 131);
+      transition: all 0.1s;
+    }
+
+    .fist {
+      height: 110px;
+      left: 40px;
+      top: 50px;
+      width: 90px;
+      border-radius: 20px 0 0 20px;
+    }
+
+    .finger {
+      width: 70px;
+      height: 30px;
+      border-radius: 20px;
+      left: 80px;
+      transform-origin: 0 50%;
+    }
+
+    .finger-1 { top: 50px; --dif: 0px; }
+    .finger-2 { top: 78px; left: 84px; --dif: 4px; }
+    .finger-3 { top: 106px; --dif: 0px; }
+    .finger-4 { top: 134px; height: 26px; left: 76px; --dif: -8px; }
+
+    div.thumb {
+      width: 35px;
+      height: 70px;
+      
+      border-radius: 0 20px 20px 20px;
+      top: 50px;
+      left: 80px;
+      border-left: 0 solid;
+      box-shadow: -17px 6px 0 -15px black;
+    }
+
+    div.arm {
+      width: 22px;
+      height: 70px;
+      left: 20px;
+      top: 70px;
+      border: 0;
+      border-top: 2px solid black;
+      border-bottom: 2px solid black;
+    }
+
+    #user-hand {
+      transform: rotateY(180deg);
+      animation: handShake2 2s infinite;
+      position: relative;
+    }
+
+    input[type="radio"] {
+      position: absolute;
+      top: -1000in;
+      left: -1000in;
+    }
+
+    input[id$="scissors"]:checked ~ div #user-hand .finger-1,
+    input[id^="scissors"]:checked ~ div #computer-hand .finger-1 {
+      width: 130px;
+      transform:rotate(-5deg);
+    }
+
+    input[id$="scissors"]:checked ~ div #user-hand .finger-2,
+    input[id^="scissors"]:checked ~ div #computer-hand .finger-2 {
+      width: 130px;
+      transform:rotate(5deg);
+    }
+
+    input[id$="paper"]:checked ~ div #user-hand .finger-1,
+    input[id$="paper"]:checked ~ div #user-hand .finger-2,
+    input[id$="paper"]:checked ~ div #user-hand .finger-3,
+    input[id$="paper"]:checked ~ div #user-hand .finger-4,
+    input[id^="paper"]:checked ~ div #computer-hand .finger-1,
+    input[id^="paper"]:checked ~ div #computer-hand .finger-2,
+    input[id^="paper"]:checked ~ div #computer-hand .finger-3,
+    input[id^="paper"]:checked ~ div #computer-hand .finger-4 {
+      left: 124px;
+      left: calc(124px + var(--dif));
+      width: 80px;
+      border-left: 0;
+      border-radius: 0 20px 20px 0;
+    }
+
+    #rock-rock:checked ~ div h2::before,
+    #paper-paper:checked ~ div h2::before,
+    #scissors-scissors:checked ~ div h2::before {
+      content: "You Tied!"
+    }
+    #rock-paper:checked ~ div h2::before,
+    #paper-scissors:checked ~ div h2::before,
+    #scissors-rock:checked ~ div h2::before {
+      content: "You Win!"
+    }
+    #rock-scissors:checked ~ div h2::before,
+    #paper-rock:checked ~ div h2::before,
+    #scissors-paper:checked ~ div h2::before {
+      content: "You Lose!"
+    }
+
+    #refreshbtn {
+        display: none; /* Hide the refresh button by default */
+        text-align: center;
+        margin-top: 20px; /* Add margin to create space between button and message */
+    }
+
+    #refreshbtn button {
+        background-color: rgb(197, 162, 96);
+        color: white;
+        padding: 15px 30px;
+        font-size: 20px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #refreshbtn button:hover {
+        background-color: rgb(124, 85, 10); 
+    }
+
+    #message {
+      text-align: center;
+      display: none;
+    }
+
+    input:checked ~ #message {
+      display: block;
+    }
+
+    #hands {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #icons {
+      width: 30px;
+      height: 200px;
+      display: inline-flex;
+      flex-direction: column;
+    }
+
+    #icons > div {
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    label:active {
+      position:static; 
+      margin-left: 60px;
+    }
+
+    label:active::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 60px;
+      z-index: 10;
+      height: 60px;
+    }
+
+
+    label {
+      animation: changeOrder 0.45s infinite linear;
+      background: #f5f5f5;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      cursor: pointer;
+      display: block;
+      height: 60px;
+      width: 60px;
+      line-height: 60px;
+      font-size: 2rem;
+      position: absolute;
+      top: 0;
+      left: 0;
+      user-select: none;
+    }
+
+    label:hover {
+      background-color: #707070; 
+    }
+
+    label:nth-of-type(1) { animation-delay: -0.00s; }
+    label:nth-of-type(2) { animation-delay: -0.15s; }
+    label:nth-of-type(3) { animation-delay: -0.30s; }
+  </style>
+</head>
+<body>
+    <form>
+        <input type="radio" id="rock-rock" name="rock-paper-scissors">
+        <input type="radio" id="rock-paper" name="rock-paper-scissors">
+        <input type="radio" id="rock-scissors" name="rock-paper-scissors">
+        <input type="radio" id="paper-rock" name="rock-paper-scissors">
+        <input type="radio" id="paper-paper" name="rock-paper-scissors">
+        <input type="radio" id="paper-scissors" name="rock-paper-scissors">
+        <input type="radio" id="scissors-rock" name="rock-paper-scissors">
+        <input type="radio" id="scissors-paper" name="rock-paper-scissors">
+        <input type="radio" id="scissors-scissors" name="rock-paper-scissors">
+      
+        <div>
+          <h1>Rock Paper Scissors AI Game</h1>
+          <div id="hands">
+            <div class="hand" id="computer-hand">
+              <div class="fist"></div>
+              <div class="finger finger-1"></div>
+              <div class="finger finger-2"></div>
+              <div class="finger finger-3"></div>
+              <div class="finger finger-4"></div>
+              <div class="thumb"></div>
+              <div class="arm"></div>
+            </div>
+            <div class="hand" id="user-hand">
+              <div class="fist"></div>
+              <div class="finger finger-1"></div>
+              <div class="finger finger-2"></div>
+              <div class="finger finger-3"></div>
+              <div class="finger finger-4"></div>
+              <div class="thumb"></div>
+              <div class="arm"></div>
+            </div>
+            <div id="icons">
+              <div>
+                <label for="rock-rock">✊</label>
+                <label for="paper-rock">✊</label>
+                <label for="scissors-rock">✊</label>
+              </div>
+              <div>
+                <label for="rock-paper">🖐️</label>
+                <label for="paper-paper">🖐️</label>
+                <label for="scissors-paper">🖐️</label>
+              </div>
+              <div>
+                <label for="rock-scissors">✌</label>
+                <label for="paper-scissors">✌</label>
+                <label for="scissors-scissors">✌</label>
+              </div>
+              <div></div>
+            </div>
+          </div>
+        </div>
+        <div id="message">
+          <h2></h2>
+          <div id="results">
+            <p>Rock Prob: <span id="rock-prob">0</span></p>
+            <p>Paper Prob: <span id="paper-prob">0</span></p>
+            <p>Scissors Prob: <span id="scissors-prob">0</span></p>
+            <p>All: <span id="all">0</span></p>
+            <p><span id="debug-msg"></span></p>
+          </div>
+        </div>
+
+        <div id="refreshbtn">
+          <button type="reset">Refresh Round</button>
+        </div>
+    </form>
+  <script>
+    let all = 0;
+    let rockCount = 0;
+    let paperCount = 0;
+    let scissorsCount = 0;
+
+    // JavaScript to toggle active class on label click
+    const labels = document.querySelectorAll('label');
+    labels.forEach(label => {
+      label.addEventListener('click', () => {
+        all++; // 'all' variable add 1 by each click
+        label.classList.toggle('active');
+          labels.forEach(label => {
+          label.style.display = 'none'; // Hide all label boxes after choice
+        });
+        document.getElementById('refreshbtn').style.display = 'block'; // Display the refresh button when any box is clicked
+        const choice = label.getAttribute('for').split('-')[1];
+        incrementCount(choice);
+      });
+    });
+  
+    // JavaScript to hide the refresh button when it's clicked
+    const refreshButton = document.querySelector('#refreshbtn button');
+    refreshButton.addEventListener('click', () => {
+      labels.forEach(label => {
+        label.style.display = 'block'; // Display all label boxes after refresh
+      });
+      document.getElementById('refreshbtn').style.display = 'none'; // Hide the refresh button after refresh
+      document.querySelector('form').reset(); // Reset form so it picks a new random choice
+    });
+  
+    // JavaScript to randomly select a choice for the website
+    const choices = ['rock', 'paper', 'scissors'];
+
+    // Function to determine computer's choice based on user's prediction
+    function determineComputerChoice() {
+        let computerChoice;
+        if (rockCount > paperCount && rockCount > scissorsCount) {
+            computerChoice = 'paper'; // If user predicts rock, computer chooses paper
+        } else if (paperCount > rockCount && paperCount > scissorsCount) {
+            computerChoice = 'scissors'; // If user predicts paper, computer chooses scissors
+        } else if (scissorsCount > rockCount && scissorsCount > paperCount) {
+            computerChoice = 'rock'; // If user predicts scissors, computer chooses rock
+        } else {
+            computerChoice = choices[Math.floor(Math.random() * choices.length)]; // If user's prediction is balanced, choose randomly
+        }
+        return computerChoice;
+    }
+
+    // Set computer's choice based on user's prediction
+    const computerChoice = determineComputerChoice();
+    document.getElementById(`computer-${computerChoice}`).checked = true;
+  
+    // Function to calculate probability
+    function incrementCount(choice) {
+      document.getElementById('all').textContent = all; // Update the "all" count
+
+      if (choice ===  'rock') {
+        rockCount++;
+      }
+      else if (choice ===  'paper') {
+        paperCount++;
+      }
+      else if (choice ===  'scissors') {
+        scissorsCount++;
+      }
+      const rockProb = (rockCount / all).toFixed(2); 
+      const paperProb = (paperCount / all).toFixed(2); 
+      const scissorsProb = (scissorsCount / all).toFixed(2); 
+
+      document.getElementById('rock-prob').textContent = rockProb; // Update the rock prob
+      document.getElementById('paper-prob').textContent = paperProb; // Update the paper prob
+      document.getElementById('scissors-prob').textContent = scissorsProb; // Update the scissors prob
+      updateDebugMsg();
+    }
+    // Add event listeners for buttons
+    function updateDebugMsg() {
+      let debugMsg = '';
+      if (all === 0) {
+        debugMsg = "Random";
+      } else if (rockCount === paperCount && paperCount === scissorsCount) {
+        debugMsg = "Random";
+      } else if (rockCount > paperCount && rockCount > scissorsCount) {
+        debugMsg = "Paper counter rock";
+      } else if (paperCount > rockCount && paperCount > scissorsCount) {
+        debugMsg = "Scissors counter paper";
+      } else if (scissorsCount > rockCount && scissorsCount > paperCount) {
+        debugMsg = "Rock counter scissors";
+      } else {
+        debugMsg = "Random";
+      }
+      document.getElementById('debug-msg').textContent = debugMsg;
+    }
+
+  </script>
+</body>
+</html>
